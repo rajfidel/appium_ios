@@ -3,12 +3,12 @@ namespace appium_uicatalog
 {
 	public static class Config
 	{
-		public static String PLATFORM_NAME = "iOS";
-		public static String BUNDLE_ID = "com.example.apple-samplecode.UICatalog";
-		public static String DEVICE_NAME = "iPhone";
-		public static String UDID = "1z1z1z1z1z1z1z1z1z1z";					//Update the UDID of the Phone
-		public static String AUTOMATION_NAME = "XCUITest";
-		public static String SERVER_URL = "http://127.0.0.1:4723/wd/hub";	//Update the ip address / port if Appium server is running on a remote server
+		public static string PLATFORM_NAME = "iOS";
+		public static string BUNDLE_ID = "com.example.apple-samplecode.UICatalog";
+		public static string DEVICE_NAME = "iPhone";
+		public static string UDID = "1z1z1z1z1z1z1z1z1z1z";					//Update the UDID of the Phone
+		public static string AUTOMATION_NAME = "XCUITest";
+		public static string SERVER_URL = "http://127.0.0.1:4723/wd/hub";	//Update the ip address / port if Appium server is running on a remote server
 		public static TimeSpan IMPLICITLY_WAIT_5SEC = TimeSpan.FromSeconds(5);
 	}
 }
