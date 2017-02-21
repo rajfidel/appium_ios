@@ -54,6 +54,9 @@
     <Compile Include="SupportFiles\Config.cs" />
     <Compile Include="SupportFiles\SupportLib.cs" />
     <Compile Include="Tests\ActionSheets.cs" />
+    <Compile Include="Tests\ActivityIndicators.cs" />
+    <Compile Include="Tests\AlertViews.cs" />
+    <Compile Include="SupportFiles\VerifyLib.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
