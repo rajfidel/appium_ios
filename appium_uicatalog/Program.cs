@@ -8,6 +8,8 @@ namespace appium_uicatalog
 		public static void Main(string[] args)
 		{
 			ActionSheets.Run();
+			ActivityIndicators.Run();
+			AlertViews.Run();
 		}
 	}
 }

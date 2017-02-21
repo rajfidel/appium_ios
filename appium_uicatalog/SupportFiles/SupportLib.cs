@@ -7,10 +7,20 @@ using OpenQA.Selenium.Remote;
 
 namespace appium_uicatalog
 {
+	public enum eGUIElementFilterByAttributeType
+	{
+		None,
+		Name,
+		Label
+	}
+
 	public enum eGUIElementType
 	{
 		Button,
 		NavBarButton,
+		AlertButton,
+		AlertTextField,
+		AlertSecureTextField,
 		TableCell,
 		ActionSheetButton,
 	}
@@ -89,6 +99,15 @@ namespace appium_uicatalog
 			}
 		}
 
+		public static void SendKeys(IOSDriver<IOSElement> appDriver, By bySelector, String keysToSend)
+		{
+			ReadOnlyCollection<IOSElement> filteredElements;
+			if (IsElementPresent(appDriver, bySelector, out filteredElements))
+			{
+				filteredElements[0].SendKeys(keysToSend);
+			}
+		}
+
 		/// <summary>
 		/// Selects the date on date picker.
 		/// </summary>
@@ -132,28 +151,69 @@ namespace appium_uicatalog
 			}
 		}
 
-		public static string GetXPath(eGUIElementType elementType, string elementName)
+		private static string GetXPathAttributeFilterText(eGUIElementFilterByAttributeType attributeType, string attributeVal)
 		{
-			string xpath = string.Empty;
+			string xpathAttributeFilterText = string.Empty;
+
+			switch (attributeType)
+			{
+				case eGUIElementFilterByAttributeType.Label:
+					xpathAttributeFilterText = "[@label='" + attributeVal + "']";
+					break;
+				case eGUIElementFilterByAttributeType.Name:
+					xpathAttributeFilterText = "[@name='" + attributeVal + "']";
+					break;
+				case eGUIElementFilterByAttributeType.None:
+					//No filter applied.
+					break;
+				default:
+					Console.WriteLine("ERROR: Unknown attributeType: " + attributeType.ToString());
+					break;
+			}
+			return xpathAttributeFilterText;
+		}
+
+		private static string GetXPathForElement(eGUIElementType elementType)
+		{
+			string xpathForElement = string.Empty;
 
 			switch (elementType)
 			{
 				case eGUIElementType.Button:
-					xpath = "//XCUIElementTypeButton[@name='" + elementName + "']";
+					xpathForElement = "//XCUIElementTypeButton";
 					break;
 				case eGUIElementType.NavBarButton:
-					xpath = "//XCUIElementTypeNavigationBar/XCUIElementTypeButton[@name='" + elementName + "']";
+					xpathForElement = "//XCUIElementTypeNavigationBar/XCUIElementTypeButton";
+					break;
+				case eGUIElementType.AlertButton:
+					xpathForElement = "//XCUIElementTypeAlert//XCUIElementTypeButton";
+					break;
+				case eGUIElementType.AlertTextField:
+					xpathForElement = "//XCUIElementTypeAlert//XCUIElementTypeTextField";
+					break;
+				case eGUIElementType.AlertSecureTextField:
+					xpathForElement = "//XCUIElementTypeAlert//XCUIElementTypeSecureTextField";
 					break;
 				case eGUIElementType.TableCell:
-					xpath = "//XCUIElementTypeCell//XCUIElementTypeStaticText[@label='" + elementName + "']";
+					xpathForElement = "//XCUIElementTypeCell//XCUIElementTypeStaticText";
 					break;
 				case eGUIElementType.ActionSheetButton:
-					xpath = "//XCUIElementTypeSheet//XCUIElementTypeButton[@label='" + elementName + "']";
+					xpathForElement = "//XCUIElementTypeSheet//XCUIElementTypeButton";
 					break;
 				default:
-					Console.WriteLine("Unknown elementType: " + elementType.ToString());
+					Console.WriteLine("ERROR: Unknown elementType: " + elementType.ToString());
 					break;
 			}
+			return xpathForElement;
+		}
+
+		public static string GetXPath(eGUIElementType elementType, eGUIElementFilterByAttributeType attributeType, string attributeName)
+		{
+			string xpath = string.Empty;
+
+			xpath = GetXPathForElement(elementType) + GetXPathAttributeFilterText(attributeType, attributeName);
+			Console.WriteLine("xpath = " + xpath);
+
 			return xpath;
 		}
 
@@ -212,7 +272,7 @@ namespace appium_uicatalog
 				{
 					if (filteredElements.Count != 1)
 					{
-						Console.WriteLine("WARNING: Multiple elements filtered: " + GetXPathsOfIOSElementReadOnlyCollection(filteredElements));
+						Console.WriteLine("ERROR: Multiple elements filtered: " + GetXPathsOfIOSElementReadOnlyCollection(filteredElements));
 					}
 					isPresent = true;
 				}
