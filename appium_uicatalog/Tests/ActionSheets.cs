@@ -20,17 +20,25 @@ namespace appium_uicatalog
 			//Select Action Sheets table cell
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Action Sheets")));
 
+			#region 'Okay / Cancel' Action Sheet
+
 			//Select Okay / Cancel table cell and select each action sheet value
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Okay / Cancel")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.ActionSheetButton, eGUIElementFilterByAttributeType.Name, "OK")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Okay / Cancel")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.ActionSheetButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
 
+			#endregion
+
+			#region 'Other' Action Sheet
+
 			//Select Other table cell and select each action sheet value
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Other")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.ActionSheetButton, eGUIElementFilterByAttributeType.Name, "Destructive Choice")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Other")));
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.ActionSheetButton, eGUIElementFilterByAttributeType.Name, "Safe Choice")));
+
+			#endregion
 
 			app.CloseApp();
 		}

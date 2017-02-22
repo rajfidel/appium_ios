@@ -57,6 +57,8 @@
     <Compile Include="Tests\ActivityIndicators.cs" />
     <Compile Include="Tests\AlertViews.cs" />
     <Compile Include="SupportFiles\VerifyLib.cs" />
+    <Compile Include="Tests\Buttons.cs" />
+    <Compile Include="Tests\DatePicker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -22,6 +22,8 @@ namespace appium_uicatalog
 			//Select 'Action Sheets' table cell
 			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Alert Views")));
 
+			#region 'Simple' Alert 
+
 			{
 				//Select 'Simple' table cell
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Simple")));
@@ -36,8 +38,12 @@ namespace appium_uicatalog
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "OK")));
 			}
 
+			#endregion
+
+			#region 'Okay / Cancel' Alert
+
 			{
-				//Select 'Okay / Simple' table cell
+				//Select 'Okay / Cancel' table cell
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label,  "Okay / Cancel")));
 
 				IAlert okayCancelAlert = app.SwitchTo().Alert();
@@ -55,6 +61,10 @@ namespace appium_uicatalog
 				//Click Cancel on alert
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
 			}
+
+			#endregion
+
+			#region 'Other' Alert
 
 			{
 				//Select 'Other' table cell
@@ -80,6 +90,10 @@ namespace appium_uicatalog
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
 			}
 
+			#endregion
+
+			#region 'Text Entry' Alert
+
 			{
 				//Select 'Text Entry' table cell
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Text Entry")));
@@ -102,6 +116,10 @@ namespace appium_uicatalog
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
 			}
 
+			#endregion
+
+			#region 'Secure Text Entry' Alert
+
 			{
 				//Select 'Secure Text Entry' table cell
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Secure Text Entry")));
@@ -123,6 +141,8 @@ namespace appium_uicatalog
 				//Click Cancel on alert
 				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
 			}
+
+			#endregion
 
 			app.CloseApp();
 		}
