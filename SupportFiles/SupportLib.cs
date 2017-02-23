@@ -25,7 +25,8 @@ namespace appium_uicatalog
 		TableCell,
 		ActionSheetButton,
 		Slider,
-		StatusBarElement
+		StatusBarElement,
+		ProgressIndicator
 	}
 
 	public static class SupportLib
@@ -305,6 +306,35 @@ namespace appium_uicatalog
 
 		}
 
+
+		/// <summary>
+		/// This method waits for the attribute of selector to attain value within specified timeout
+		/// </summary>
+		/// <param name="appDriver">Application driver</param>
+		/// <param name="selector">selector for element</param>
+		/// <param name="attributeName">attribute name</param>
+		/// <param name="attributeVal">attribute value to wait for</param>
+		/// <param name="timeOut">timeout</param>
+		/// <returns>true if element attribute reaches value within timeout, else false</returns>
+		public static bool WaitForAttributeValue(IOSDriver<IOSElement> appDriver, By selector, string attributeName, string attributeVal, TimeSpan timeOut)
+		{
+			DateTime startDateTime = DateTime.Now;
+			ReadOnlyCollection<IOSElement> roDisplayedElements;
+			bool isConditionMet = false;
+			do
+			{
+				if (IsElementDisplayed(appDriver, selector, out roDisplayedElements))
+				{
+					if (roDisplayedElements[0].GetAttribute(attributeName).Equals(attributeVal))
+					{
+						isConditionMet = true;
+						break;
+					}
+				}
+			} while (DateTime.Now.Subtract(startDateTime).CompareTo(timeOut) < 0);
+			return isConditionMet;
+		}
+
 		/// <summary>
 		/// This method gets the XPath including the attribute filter.
 		/// </summary>
@@ -389,6 +419,9 @@ namespace appium_uicatalog
 					break;
 				case eGUIElementType.StatusBarElement:
 					xpathForElement = "//XCUIElementTypeStatusBar//XCUIElementTypeOther";
+					break;
+				case eGUIElementType.ProgressIndicator:
+					xpathForElement = "//XCUIElementTypeProgressIndicator";
 					break;
 				default:
 					Console.WriteLine("ERROR: Unknown elementType: " + elementType.ToString());
