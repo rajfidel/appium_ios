@@ -61,6 +61,7 @@
     <Compile Include="Tests\DatePicker.cs" />
     <Compile Include="Tests\Sliders.cs" />
     <Compile Include="Tests\ProgressViews.cs" />
+    <Compile Include="Tests\PickerView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -26,7 +26,8 @@ namespace appium_uicatalog
 		ActionSheetButton,
 		Slider,
 		StatusBarElement,
-		ProgressIndicator
+		ProgressIndicator,
+		PickerWheel
 	}
 
 	public static class SupportLib
@@ -47,6 +48,29 @@ namespace appium_uicatalog
 			IOSDriver<IOSElement> appDriver = new IOSDriver<IOSElement>(new Uri(Config.SERVER_URL), capabilities, TimeSpan.FromMinutes(5));
 			appDriver.Manage().Timeouts().ImplicitlyWait(Config.IMPLICITLY_WAIT_5SEC);
 			return appDriver;
+		}
+
+		/// <summary>
+		/// Sets the picker wheel values.
+		/// </summary>
+		/// <param name="appDriver">App driver.</param>
+		/// <param name="valuesToSelect">Values to select - all values for picker wheel have to be provided</param>
+		public static void SetPickerWheelValues(IOSDriver<IOSElement> appDriver, params string[] valuesToSelect)
+		{
+			ReadOnlyCollection<IOSElement> displayedElements = FindDisplayedElements(appDriver, By.XPath(GetXPath(eGUIElementType.PickerWheel, eGUIElementFilterByAttributeType.None, string.Empty)));
+			if (displayedElements.Count != valuesToSelect.Length)
+			{
+				Console.WriteLine("ERROR: number of picker wheels displayed: " + displayedElements.Count + 
+				                  ". number of values to select: " + valuesToSelect.Length + 
+				                  ". They should match.");
+			}
+			else
+			{
+				for (int i = 0; i < displayedElements.Count; i++)
+				{
+					displayedElements[i].SendKeys(valuesToSelect[i]);
+				}
+			}
 		}
 
 		/// <summary>
@@ -95,7 +119,7 @@ namespace appium_uicatalog
 
 			if (!IsElementDisplayed(appDriver, searchItemSelector, out displayedSearchItems))
 			{
-				Console.WriteLine("Error: Element not available");
+				Console.WriteLine("ERROR: Element not available");
 			}
 			else
 			{
@@ -132,14 +156,7 @@ namespace appium_uicatalog
 						indexOfFirstDisplayedElement = i;
 					}
 				}
-				if (indexOfFirstDisplayedElement != -1)
-				{
-					filteredElements[indexOfFirstDisplayedElement].Click();
-				}
-				else
-				{
-					Console.WriteLine("ERROR: Element found but not displayed");
-				}
+				filteredElements[indexOfFirstDisplayedElement].Click();
 			}
 			else
 			{
@@ -422,6 +439,9 @@ namespace appium_uicatalog
 					break;
 				case eGUIElementType.ProgressIndicator:
 					xpathForElement = "//XCUIElementTypeProgressIndicator";
+					break;
+				case eGUIElementType.PickerWheel:
+					xpathForElement = "//XCUIElementTypePickerWheel";
 					break;
 				default:
 					Console.WriteLine("ERROR: Unknown elementType: " + elementType.ToString());
