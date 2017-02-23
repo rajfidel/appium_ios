@@ -18,9 +18,11 @@ namespace appium_uicatalog
 			//Navigate back to Main menu
 			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
 
-			//Select 'Action Sheets' table cell
-			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Buttons")));
+			//Select 'Buttons' table cell
+			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
+											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Buttons")));
 
+			//TODO Select various buttons.
 
 		}
 

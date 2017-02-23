@@ -17,8 +17,9 @@ namespace appium_uicatalog
 			//Navigate back to Main menu
 			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
 
-			//Select 'Action Sheets' table cell
-			SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Date Picker")));
+			//Select 'Date Picker' table cell
+			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
+											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Date Picker")));
 
 			DateTime currentDate = DateTime.Now;
 			DateTime dateTimeToSet = currentDate.AddDays(2).AddHours(2).AddMinutes(2);

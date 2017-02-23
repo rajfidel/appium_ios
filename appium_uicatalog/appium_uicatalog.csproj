@@ -59,6 +59,7 @@
     <Compile Include="SupportFiles\VerifyLib.cs" />
     <Compile Include="Tests\Buttons.cs" />
     <Compile Include="Tests\DatePicker.cs" />
+    <Compile Include="Tests\Sliders.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

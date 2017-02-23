@@ -53,11 +53,11 @@ namespace appium_uicatalog
 
 		public static void VerifyProperty(IOSDriver<IOSElement> appDriver, By selector, string attributeName, string expAttributeVal, params string[] reqTags)
 		{
-			ReadOnlyCollection<IOSElement> elements;
+			ReadOnlyCollection<IOSElement> displayedElements;
 			string actAttributeVal = string.Empty;
-			if (SupportLib.IsElementPresent(appDriver, selector, out elements))
+			if (SupportLib.IsElementDisplayed(appDriver, selector, out displayedElements))
 			{
-				actAttributeVal = elements[0].GetAttribute(attributeName);
+				actAttributeVal = displayedElements[0].GetAttribute(attributeName);
 			}
 			VerifyString(actAttributeVal, expAttributeVal, reqTags);
 		}

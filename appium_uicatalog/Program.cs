@@ -8,10 +8,11 @@ namespace appium_uicatalog
 		public static void Main(string[] args)
 		{
 			ActionSheets.Run();
-			ActivityIndicators.Run();	//TODO
+			ActivityIndicators.Run();	
 			AlertViews.Run();	
-			Buttons.Run();		//TODO
+			Buttons.Run();		
 			DatePicker.Run();
+			Sliders.Run();
 		}
 	}
 }
