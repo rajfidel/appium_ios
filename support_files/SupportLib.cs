@@ -8,6 +8,12 @@ using System.Collections.Generic;
 
 namespace appium_uicatalog
 {
+	public enum eSwitchValue
+	{
+		On,
+		Off
+	}
+
 	public enum eGUIElementFilterByAttributeType
 	{
 		None,
@@ -26,6 +32,7 @@ namespace appium_uicatalog
 		ActionSheetButton,
 		Slider,
 		StatusBarElement,
+		Switch,
 		ProgressIndicator,
 		PickerWheel
 	}
@@ -48,6 +55,31 @@ namespace appium_uicatalog
 			IOSDriver<IOSElement> appDriver = new IOSDriver<IOSElement>(new Uri(Config.SERVER_URL), capabilities, TimeSpan.FromMinutes(5));
 			appDriver.Manage().Timeouts().ImplicitlyWait(Config.IMPLICITLY_WAIT_5SEC);
 			return appDriver;
+		}
+
+		/// <summary>
+		/// Sets the switch value to On / Off.
+		/// </summary>
+		/// <param name="appDriver">App driver.</param>
+		/// <param name="selector">Selector for switch.</param>
+		/// <param name="value">Value to be selected on switch.</param>
+		public static void SetSwitchValue(IOSDriver<IOSElement> appDriver, By selector, eSwitchValue value)
+		{
+			ReadOnlyCollection<IOSElement> displayedElements;
+			if (IsElementDisplayed(appDriver, selector, out displayedElements))
+			{
+				IOSElement switchElement = displayedElements[0];
+				string currentSwitchValue = displayedElements[0].GetAttribute("value");
+				if ((value == eSwitchValue.Off && currentSwitchValue.Equals("1")) ||
+					(value == eSwitchValue.On && currentSwitchValue.Equals("0")))
+				{
+					Click(switchElement);
+				}
+			}
+			else
+			{
+				Console.WriteLine("ERROR: Element not available");
+			}
 		}
 
 		/// <summary>
@@ -436,6 +468,9 @@ namespace appium_uicatalog
 					break;
 				case eGUIElementType.StatusBarElement:
 					xpathForElement = "//XCUIElementTypeStatusBar//XCUIElementTypeOther";
+					break;
+				case eGUIElementType.Switch:
+					xpathForElement = "//XCUIElementTypeSwitch";
 					break;
 				case eGUIElementType.ProgressIndicator:
 					xpathForElement = "//XCUIElementTypeProgressIndicator";

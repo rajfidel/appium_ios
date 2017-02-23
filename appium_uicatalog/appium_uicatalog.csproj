@@ -51,8 +51,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\SupportFiles\Config.cs" />
-    <Compile Include="..\SupportFiles\SupportLib.cs" />
+    <Compile Include="..\support_files\Config.cs" />
+    <Compile Include="..\support_files\SupportLib.cs" />
     <Compile Include="Tests\ActionSheets.cs" />
     <Compile Include="Tests\ActivityIndicators.cs" />
     <Compile Include="Tests\AlertViews.cs" />

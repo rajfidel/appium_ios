@@ -5,7 +5,6 @@ using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium.iOS;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Appium.MultiTouch;
 
 namespace appium_uicatalog
 {
