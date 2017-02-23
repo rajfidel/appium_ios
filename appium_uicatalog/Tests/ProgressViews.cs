@@ -8,9 +8,8 @@ using OpenQA.Selenium.Remote;
 
 namespace appium_uicatalog
 {
-	public static class Buttons
+	public static class ProgressViews
 	{
-
 		public static void Run()
 		{
 			IOSDriver<IOSElement> app = SupportLib.SetupApp();
@@ -18,15 +17,15 @@ namespace appium_uicatalog
 			//Navigate back to Main menu
 			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
 
-			//Select 'Buttons' table cell
+			//Select 'Progress Views' table cell
 			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
-											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Buttons")));
+											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Progress Views")));
 
-			//TODO Select various buttons.
+			Console.WriteLine(SupportLib.WaitForAttributeValue(app, By.XPath(SupportLib.GetXPath(eGUIElementType.ProgressIndicator, eGUIElementFilterByAttributeType.None, string.Empty)),
+															   "value", "100%", TimeSpan.FromSeconds(30)));
 
 			app.CloseApp();
 
 		}
-
 	}
 }

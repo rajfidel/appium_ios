@@ -34,6 +34,7 @@ namespace appium_uicatalog
 
 			}
 
+			app.CloseApp();
 
 		}
 	}

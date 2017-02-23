@@ -60,6 +60,7 @@
     <Compile Include="Tests\Buttons.cs" />
     <Compile Include="Tests\DatePicker.cs" />
     <Compile Include="Tests\Sliders.cs" />
+    <Compile Include="Tests\ProgressViews.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
