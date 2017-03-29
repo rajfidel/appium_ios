@@ -46,17 +46,23 @@ namespace appium_uicatalog
 	public static class SupportLib
 	{
 
-		private static void PrintException(Exception e) { 
-			Console.WriteLine("ERROR: " + e.Message + "\n" + e.StackTrace);
-		}
-
-
+		/// <summary>
+		/// Finds the elements by selector.
+		/// </summary>
+		/// <returns>The elements.</returns>
+		/// <param name="bySelector">By selector.</param>
 		public static ReadOnlyCollection<AppiumWebElement> FindElements(By bySelector)
 		{
 			ReadOnlyCollection<AppiumWebElement> elements = AppManager.CurrentAppDriver.FindElements(bySelector);
 			return elements;
 		}
 
+		/// <summary>
+		/// Gets the attribute value for an AppiumWebElement.
+		/// </summary>
+		/// <returns>The attribute value.</returns>
+		/// <param name="element">Element.</param>
+		/// <param name="attribute">Attribute.</param>
 		public static string GetAttributeValue(AppiumWebElement element, eGUIElementAttribute attribute)
 		{
 			string attributeVal = string.Empty;
@@ -84,8 +90,15 @@ namespace appium_uicatalog
 			return attributeVal;
 		}
 
-
-		public static bool WaitForAttributeValue(By selector, eGUIElementAttribute attribute, string value, int timeoutMS) 
+		/// <summary>
+		/// Waits for attribute value to be attained.
+		/// </summary>
+		/// <returns><c>true</c>, if for attribute value was waited, <c>false</c> otherwise.</returns>
+		/// <param name="bySelector">Selector.</param>
+		/// <param name="attribute">Attribute.</param>
+		/// <param name="value">Value.</param>
+		/// <param name="timeoutMS">Timeout ms.</param>
+		public static bool WaitForAttributeValue(By bySelector, eGUIElementAttribute attribute, string value, int timeoutMS) 
 		{
 			DefaultWait<AppiumDriver<AppiumWebElement>> wait = new DefaultWait<AppiumDriver<AppiumWebElement>>(AppManager.CurrentAppDriver);
 			wait.PollingInterval = TimeSpan.FromMilliseconds(250);
@@ -98,7 +111,7 @@ namespace appium_uicatalog
 			{
 				isSuccessful = wait.Until<bool>((d) =>
 				{
-					AppiumWebElement element = d.FindElement(selector);
+					AppiumWebElement element = d.FindElement(bySelector);
 					if (GetAttributeValue(element, attribute).Equals(value))
 					{
 						return true;
@@ -195,6 +208,11 @@ namespace appium_uicatalog
 			}
 		}
 
+		/// <summary>
+		/// This method Scrolls to item.
+		/// </summary>
+		/// <param name="searchItemSelector">Search item selector.</param>
+		/// <param name="maxTryCount">Max try count.</param>
 		public static void ScrollToItem(By searchItemSelector, int maxTryCount = 5) 
 		{ 
 			int elementXAxisScrollPt = 10;
@@ -233,7 +251,14 @@ namespace appium_uicatalog
 		/// <param name="element">element to be clicked</param>
 		public static void Click(AppiumWebElement element)
 		{
-			element.Click();
+			try
+			{
+				element.Click();
+			}
+			catch (Exception e) 
+			{
+				PrintException(e);
+			}
 		}
 
 		/// <summary>
@@ -254,9 +279,21 @@ namespace appium_uicatalog
 			}
 		}
 
+		/// <summary>
+		/// Sends the keys to the element defined by AppiumWebElement.
+		/// </summary>
+		/// <param name="element">Element.</param>
+		/// <param name="keysToSend">Keys to send.</param>
 		public static void SendKeys(AppiumWebElement element, String keysToSend)
 		{
-			element.SendKeys(keysToSend);
+			try
+			{
+				element.SendKeys(keysToSend);
+			}
+			catch (Exception e)
+			{
+				PrintException(e);
+			}
 		}
 
 		/// <summary>
@@ -453,8 +490,6 @@ namespace appium_uicatalog
 			return xpath;
 		}
 
-		#region Private Methods
-
 		/// <summary>
 		/// This method gets the XPath attribute filter text.
 		/// </summary>
@@ -540,7 +575,13 @@ namespace appium_uicatalog
 			return xpathForElement;
 		}
 
+		#region Private Methods
 
+		/// <summary>
+		/// Gets the first displayed element.
+		/// </summary>
+		/// <returns>The first displayed element.</returns>
+		/// <param name="bySelector">By selector.</param>
 		private static AppiumWebElement GetFirstDisplayedElement(By bySelector) 
 		{
 			AppiumWebElement firstDisplayedElement = null;
@@ -564,6 +605,15 @@ namespace appium_uicatalog
 		{
 			AppiumWebElement firstDisplayedStatusBarElement = GetFirstDisplayedElement(By.XPath(GetXPath(eGUIElementType.StatusBarElement)));
 			Click(firstDisplayedStatusBarElement);
+		}
+
+		/// <summary>
+		/// This method logs exception
+		/// </summary>
+		/// <param name="e">E.</param>
+		private static void PrintException(Exception e)
+		{
+			Console.WriteLine("ERROR: " + e.Message + "\n" + e.StackTrace);
 		}
 
 		#endregion
