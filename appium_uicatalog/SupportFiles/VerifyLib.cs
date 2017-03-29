@@ -1,24 +1,24 @@
-﻿using System;
+using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium.iOS;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
+using OpenQA.Selenium.Appium;
 
 namespace appium_uicatalog
 {
 	public static class VerifyLib
 	{
-		public static void VerifyAlertButtons(IOSDriver<IOSElement> appDriver, IAlert alert, string[] expButtonsByName, params string[] reqTags)
+		public static void VerifyAlertButtons(string[] expButtonsByName, params string[] reqTags)
 		{
-			ReadOnlyCollection<IOSElement> alertButtons = appDriver.FindElements(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.None, string.Empty)));
+			ReadOnlyCollection<AppiumWebElement> alertButtons = AppManager.CurrentAppDriver.FindElements(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.None, string.Empty)));
 
 			String[] actButtonsByName = new String[alertButtons.Count];
 			for (int i = 0; i < alertButtons.Count; i++)
 			{
 				actButtonsByName[i] = alertButtons[i].GetAttribute("name");
 			}
-
 			VerifyString(String.Join(",", actButtonsByName), String.Join(",", expButtonsByName), reqTags);
 		}
 
@@ -51,14 +51,10 @@ namespace appium_uicatalog
 			}
 		}
 
-		public static void VerifyProperty(IOSDriver<IOSElement> appDriver, By selector, string attributeName, string expAttributeVal, params string[] reqTags)
+		public static void VerifyProperty(AppiumDriver<AppiumWebElement> appDriver, By selector, eGUIElementAttribute attribute, string expAttributeVal, params string[] reqTags)
 		{
-			ReadOnlyCollection<IOSElement> displayedElements;
-			string actAttributeVal = string.Empty;
-			if (SupportLib.IsElementDisplayed(appDriver, selector, out displayedElements))
-			{
-				actAttributeVal = displayedElements[0].GetAttribute(attributeName);
-			}
+			AppiumWebElement element = SupportLib.FindElement(selector);
+			string actAttributeVal = SupportLib.GetAttributeValue(element, attribute);
 			VerifyString(actAttributeVal, expAttributeVal, reqTags);
 		}
 	}

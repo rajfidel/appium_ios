@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Enums;
@@ -12,16 +12,11 @@ namespace appium_uicatalog
 	{
 		public static void Run()
 		{
-			IOSDriver<IOSElement> app = SupportLib.SetupApp();
-
 			//Navigate back to Main menu
-			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
+			SupportLib.ClickUntilElementNotAvailable(By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementAttribute.Name, "Back")));
 
 			//Select 'Activity Indicators' table cell
-			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
-			                                   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Activity Indicators")));
-
-			app.CloseApp();
+			SupportLib.ScrollAndSelectListItem(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Activity Indicators")));
 		}
 	}
 }

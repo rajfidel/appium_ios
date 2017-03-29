@@ -9,16 +9,18 @@ read -n 1 -s -p "Press any key to continue"
 echo "****USER PROMPT****"
 echo "Reconnect iPhone to Mac and set sleep setting to Never. Remove existing WebDriver application from iPhone"
 read -n 1 -s -p "Press any key to continue"
-echo -ne '\n' | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
-brew install node
+brew install node@6     #install node 6.1 LTS
+brew unlink node
+brew link --force node@6
 npm install -g npm
+#sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
 npm install -g appium #'npm install -g appium --no-shrinkwrap' to get latest updates
 npm install -g appium-doctor
 npm install wd
 cd /usr/local/lib/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent
 brew install carthage
-npm i -g webpack
+npm install -g webpack
 ./Scripts/bootstrap.sh -d
 brew install --HEAD libimobiledevice
 brew install ideviceinstaller

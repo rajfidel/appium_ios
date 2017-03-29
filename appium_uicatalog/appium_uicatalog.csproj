@@ -42,10 +42,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="WebDriver">
-      <HintPath>packages\Selenium.WebDriver.3.1.0\lib\net40\WebDriver.dll</HintPath>
+      <HintPath>packages\Selenium.WebDriver.3.2.0\lib\net40\WebDriver.dll</HintPath>
     </Reference>
     <Reference Include="WebDriver.Support">
-      <HintPath>packages\Selenium.Support.3.1.0\lib\net40\WebDriver.Support.dll</HintPath>
+      <HintPath>packages\Selenium.Support.3.2.0\lib\net40\WebDriver.Support.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +62,7 @@
     <Compile Include="Tests\Sliders.cs" />
     <Compile Include="Tests\ProgressViews.cs" />
     <Compile Include="Tests\PickerView.cs" />
+    <Compile Include="AppManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

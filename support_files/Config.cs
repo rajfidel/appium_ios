@@ -4,7 +4,7 @@ namespace appium_uicatalog
 	public static class Config
 	{
 		public static string PLATFORM_NAME = "iOS";
-		public static string BUNDLE_ID = "com.example.apple-samplecode.UICatalog";
+		public static string BUNDLE_ID = "com.sjm.crmd.patientappios";// "com.example.apple-samplecode.UICatalog";
 		public static string DEVICE_NAME = "iPhone";
 		public static string UDID = "7d1ce4873fbae7a4012d1419ed91f70b208a17de";					//Update the UDID of the Phone
 		public static string AUTOMATION_NAME = "XCUITest";

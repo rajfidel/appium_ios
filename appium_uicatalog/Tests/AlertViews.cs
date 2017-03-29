@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium.iOS;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
+using OpenQA.Selenium.Appium;
 
 namespace appium_uicatalog
 {
@@ -12,32 +13,30 @@ namespace appium_uicatalog
 	{
 		public static void Run()
 		{
-			IOSDriver<IOSElement> app = SupportLib.SetupApp();
 
 			string expTitle = "A Short Title Is Best\nA message should be a short, complete sentence.";
 
 			//Navigate back to Main menu
-			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
+			SupportLib.ClickUntilElementNotAvailable(By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementAttribute.Name, "Back")));
 
 			//Select 'Alert Views' table cell
-			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
-											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Alerts Views")));
+			SupportLib.ScrollAndSelectListItem(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Alerts Views")));
 
 
 			#region 'Simple' Alert 
 
 			{
 				//Select 'Simple' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Simple")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Simple")));
 
-				IAlert simpleAlert = app.SwitchTo().Alert();
-				VerifyLib.VerifyAlertButtons(app, simpleAlert, new String[] { "OK" }, "Req1");	//Req1 is the imaginary requirement tag that is verified.
+				VerifyLib.VerifyAlertButtons(new String[] { "OK" }, "Req1");    //Req1 is the imaginary requirement tag that is verified.
 
-				string actTitle = simpleAlert.Text;
+				AppiumWebElement alertText = SupportLib.FindElement(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertText)));
+				string actTitle = SupportLib.GetAttributeValue(alertText, eGUIElementAttribute.Label);
 				VerifyLib.VerifyString(actTitle, expTitle, "Req1");     
 
 				//Click OK on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "OK")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "OK")));
 			}
 
 			#endregion
@@ -46,22 +45,21 @@ namespace appium_uicatalog
 
 			{
 				//Select 'Okay / Cancel' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label,  "Okay / Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label,  "Okay / Cancel")));
 
-				IAlert okayCancelAlert = app.SwitchTo().Alert();
-				VerifyLib.VerifyAlertButtons(app, okayCancelAlert, new String[] { "Cancel", "OK" }, "Req2");  
-
-				string actTitle = okayCancelAlert.Text;
+				VerifyLib.VerifyAlertButtons(new String[] { "Cancel", "OK" }, "Req2");  
+				AppiumWebElement alertText = SupportLib.FindElement(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertText)));
+				string actTitle = SupportLib.GetAttributeValue(alertText, eGUIElementAttribute.Label);
 				VerifyLib.VerifyString(actTitle, expTitle, "Req2");     
 
 				//Click OK on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "OK")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "OK")));
 
 				//Select 'Okay / Simple' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Okay / Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Okay / Cancel")));
 
 				//Click Cancel on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Cancel")));
 			}
 
 			#endregion
@@ -70,26 +68,26 @@ namespace appium_uicatalog
 
 			{
 				//Select 'Other' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Other")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Other")));
 
-				IAlert otherAlert = app.SwitchTo().Alert();
-				VerifyLib.VerifyAlertButtons(app, otherAlert, new String[] { "Choice One", "Choice Two", "Cancel" }, "Req3");
+				VerifyLib.VerifyAlertButtons(new String[] { "Choice One", "Choice Two", "Cancel" }, "Req3");
 
-				string actTitle = otherAlert.Text;
+				AppiumWebElement alertText = SupportLib.FindElement(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertText)));
+				string actTitle = SupportLib.GetAttributeValue(alertText, eGUIElementAttribute.Label);
 				VerifyLib.VerifyString(actTitle, expTitle, "Req3");
 
 				//Click Choice One on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Choice One")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Choice One")));
 
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Other")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Other")));
 
 				//Click Choice Two on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Choice Two")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Choice Two")));
 
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Other")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Other")));
 
 				//Click Cancel on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Cancel")));
 			}
 
 			#endregion
@@ -98,24 +96,24 @@ namespace appium_uicatalog
 
 			{
 				//Select 'Text Entry' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Text Entry")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Text Entry")));
 
-				IAlert otherAlert = app.SwitchTo().Alert();
-				VerifyLib.VerifyAlertButtons(app, otherAlert, new String[] { "OK", "Cancel" }, "Req4");
+				VerifyLib.VerifyAlertButtons(new String[] { "OK", "Cancel" }, "Req4");
 
-				string actTitle = otherAlert.Text;
+				AppiumWebElement alertText = SupportLib.FindElement(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertText)));
+				string actTitle = SupportLib.GetAttributeValue(alertText, eGUIElementAttribute.Label);
 				VerifyLib.VerifyString(actTitle, expTitle, "Req4");
 
 				//Send keys to text field
-				SupportLib.SendKeys(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertTextField, eGUIElementFilterByAttributeType.None, String.Empty)), "Hi");
+				SupportLib.SendKeys(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertTextField, eGUIElementAttribute.None, String.Empty)), "Hi");
 
 				//Click OK on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "OK")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "OK")));
 
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Text Entry")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Text Entry")));
 
 				//Click Cancel on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Cancel")));
 			}
 
 			#endregion
@@ -124,29 +122,27 @@ namespace appium_uicatalog
 
 			{
 				//Select 'Secure Text Entry' table cell
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Secure Text Entry")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Secure Text Entry")));
 
-				IAlert otherAlert = app.SwitchTo().Alert();
-				VerifyLib.VerifyAlertButtons(app, otherAlert, new String[] { "OK", "Cancel" }, "Req5");
+				VerifyLib.VerifyAlertButtons(new String[] { "OK", "Cancel" }, "Req5");
 
-				string actTitle = otherAlert.Text;
+				AppiumWebElement alertText = SupportLib.FindElement(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertText)));
+				string actTitle = SupportLib.GetAttributeValue(alertText, eGUIElementAttribute.Label);
 				VerifyLib.VerifyString(actTitle, expTitle, "Req5");
 
 				//Send keys to text field
-				SupportLib.SendKeys(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertSecureTextField, eGUIElementFilterByAttributeType.None, String.Empty)), "password");
+				SupportLib.SendKeys(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertSecureTextField, eGUIElementAttribute.None, String.Empty)), "password");
 
 				//Click OK on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "OK")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "OK")));
 
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Secure Text Entry")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Secure Text Entry")));
 
 				//Click Cancel on alert
-				SupportLib.Click(app, By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementFilterByAttributeType.Name, "Cancel")));
+				SupportLib.Click(By.XPath(SupportLib.GetXPath(eGUIElementType.AlertButton, eGUIElementAttribute.Name, "Cancel")));
 			}
 
 			#endregion
-
-			app.CloseApp();
 		}
 	}
 }

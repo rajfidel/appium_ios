@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Enums;
@@ -12,28 +12,11 @@ namespace appium_uicatalog
 	{
 		public static void Run()
 		{
-
-			IOSDriver<IOSElement> app = SupportLib.SetupApp();
-
 			//Navigate back to Main menu
-			SupportLib.ClickUntilElementNotAvailable(app, By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementFilterByAttributeType.Name, "Back")));
+			SupportLib.ClickUntilElementNotAvailable(By.XPath(SupportLib.GetXPath(eGUIElementType.NavBarButton, eGUIElementAttribute.Name, "Back")));
 
 			//Select 'Sliders' table cell
-			SupportLib.ScrollAndSelectListItem(app, By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.None, string.Empty)),
-											   By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementFilterByAttributeType.Label, "Sliders")));
-
-			ReadOnlyCollection<IOSElement> displayedSliders;
-			if (SupportLib.IsElementDisplayed(app, By.XPath(SupportLib.GetXPath(eGUIElementType.Slider, eGUIElementFilterByAttributeType.None, string.Empty)), 
-			                                  out displayedSliders))
-			{
-				for (int i = 0; i < displayedSliders.Count; i++)
-				{
-					//TODO Set Slider values
-				}
-
-			}
-
-			app.CloseApp();
+			SupportLib.ScrollAndSelectListItem(By.XPath(SupportLib.GetXPath(eGUIElementType.TableCell, eGUIElementAttribute.Label, "Sliders")));
 
 		}
 	}

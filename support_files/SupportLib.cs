@@ -5,6 +5,8 @@ using OpenQA.Selenium.Appium.iOS;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
 using System.Collections.Generic;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Support.UI;
 
 namespace appium_uicatalog
 {
@@ -14,11 +16,14 @@ namespace appium_uicatalog
 		Off
 	}
 
-	public enum eGUIElementFilterByAttributeType
+	public enum eGUIElementAttribute
 	{
 		None,
 		Name,
-		Label
+		Label,
+		Value,
+		Displayed,
+		Enabled
 	}
 
 	public enum eGUIElementType
@@ -26,6 +31,7 @@ namespace appium_uicatalog
 		Button,
 		NavBarButton,
 		AlertButton,
+		AlertText,
 		AlertTextField,
 		AlertSecureTextField,
 		TableCell,
@@ -40,68 +46,168 @@ namespace appium_uicatalog
 	public static class SupportLib
 	{
 
-		/// <summary>
-		/// Sets up the app and returns initialized instance of IOSDriver
-		/// </summary>
-		/// <returns>The app.</returns>
-		public static IOSDriver<IOSElement> SetupApp()
-		{
-			DesiredCapabilities capabilities = new DesiredCapabilities();
-			capabilities.SetCapability(MobileCapabilityType.PlatformName, Config.PLATFORM_NAME);
-			capabilities.SetCapability(MobileCapabilityType.DeviceName, Config.DEVICE_NAME);
-			capabilities.SetCapability(IOSMobileCapabilityType.BundleId, Config.BUNDLE_ID);
-			capabilities.SetCapability(MobileCapabilityType.Udid, Config.UDID);
-			capabilities.SetCapability(MobileCapabilityType.AutomationName, Config.AUTOMATION_NAME);
-			IOSDriver<IOSElement> appDriver = new IOSDriver<IOSElement>(new Uri(Config.SERVER_URL), capabilities, TimeSpan.FromMinutes(5));
-			appDriver.Manage().Timeouts().ImplicitlyWait(Config.IMPLICITLY_WAIT_5SEC);
-			return appDriver;
+		private static void PrintException(Exception e) { 
+			Console.WriteLine("ERROR: " + e.Message + "\n" + e.StackTrace);
 		}
+
+
+		public static ReadOnlyCollection<AppiumWebElement> FindElements(By bySelector)
+		{
+			ReadOnlyCollection<AppiumWebElement> elements = AppManager.CurrentAppDriver.FindElements(bySelector);
+			return elements;
+		}
+
+		public static string GetAttributeValue(AppiumWebElement element, eGUIElementAttribute attribute)
+		{
+			string attributeVal = string.Empty;
+			switch (attribute)
+			{
+				case eGUIElementAttribute.Name:
+					attributeVal = element.GetAttribute("name");
+					break;
+				case eGUIElementAttribute.Label:
+					attributeVal = element.GetAttribute("label");
+					break;
+				case eGUIElementAttribute.Value:
+					attributeVal = element.GetAttribute("value");
+					break;
+				case eGUIElementAttribute.Displayed:
+					attributeVal = element.Displayed.ToString().ToLower();
+					break;
+				case eGUIElementAttribute.Enabled:
+					attributeVal = element.Enabled.ToString().ToLower();
+					break;
+				default:
+					Console.WriteLine("Unknonwn attribute : " + attribute.ToString());
+					break;
+			}
+			return attributeVal;
+		}
+
+
+		public static bool WaitForAttributeValue(By selector, eGUIElementAttribute attribute, string value, int timeoutMS) 
+		{
+			DefaultWait<AppiumDriver<AppiumWebElement>> wait = new DefaultWait<AppiumDriver<AppiumWebElement>>(AppManager.CurrentAppDriver);
+			wait.PollingInterval = TimeSpan.FromMilliseconds(250);
+			wait.Timeout = TimeSpan.FromMilliseconds(timeoutMS);
+			wait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+			wait.IgnoreExceptionTypes(typeof(TimeoutException));
+
+			bool isSuccessful = false;
+			try
+			{
+				isSuccessful = wait.Until<bool>((d) =>
+				{
+					AppiumWebElement element = d.FindElement(selector);
+					if (GetAttributeValue(element, attribute).Equals(value))
+					{
+						return true;
+					}
+					else
+					{
+						throw new TimeoutException();
+					}
+				});
+			}
+			catch (Exception e)
+			{
+				PrintException(e);
+			}
+
+			return isSuccessful;
+		}
+
+		/// <summary>
+		/// This method finds the element. Explicit wait time of 2 second is provided for this method to find the element.
+		/// </summary>
+		/// <returns>The element.</returns>
+		/// <param name="bySelector">By selector.</param>
+		public static AppiumWebElement FindElement(By bySelector)
+		{
+			DefaultWait<AppiumDriver<AppiumWebElement>> wait = new DefaultWait<AppiumDriver<AppiumWebElement>>(AppManager.CurrentAppDriver);
+			AppiumWebElement elementFound = null;
+			wait.PollingInterval = TimeSpan.FromMilliseconds(250);
+			wait.Timeout = TimeSpan.FromSeconds(2);
+			wait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+			try
+			{
+				elementFound = wait.Until((d) =>
+				{
+					return d.FindElement(bySelector);
+				});
+			}
+			catch (Exception e)
+			{
+				PrintException(e);
+			}
+			return elementFound;
+		}
+
+
 
 		/// <summary>
 		/// Sets the switch value to On / Off.
 		/// </summary>
-		/// <param name="appDriver">App driver.</param>
-		/// <param name="selector">Selector for switch.</param>
+		/// <param name="bySelector">Selector for switch.</param>
 		/// <param name="value">Value to be selected on switch.</param>
-		public static void SetSwitchValue(IOSDriver<IOSElement> appDriver, By selector, eSwitchValue value)
+		public static void SetSwitchValue(By bySelector, eSwitchValue value)
 		{
-			ReadOnlyCollection<IOSElement> displayedElements;
-			if (IsElementDisplayed(appDriver, selector, out displayedElements))
+			AppiumWebElement switchElement = null;
+
+			try
 			{
-				IOSElement switchElement = displayedElements[0];
-				string currentSwitchValue = displayedElements[0].GetAttribute("value");
+				switchElement = FindElement(bySelector);
+				string currentSwitchValue = switchElement.GetAttribute("value");
 				if ((value == eSwitchValue.Off && currentSwitchValue.Equals("1")) ||
 					(value == eSwitchValue.On && currentSwitchValue.Equals("0")))
 				{
 					Click(switchElement);
 				}
 			}
-			else
+			catch (Exception e)
 			{
-				Console.WriteLine("ERROR: Element not available");
+				PrintException(e);
 			}
 		}
 
 		/// <summary>
 		/// Sets the picker wheel values.
 		/// </summary>
-		/// <param name="appDriver">App driver.</param>
 		/// <param name="valuesToSelect">Values to select - all values for picker wheel have to be provided</param>
-		public static void SetPickerWheelValues(IOSDriver<IOSElement> appDriver, params string[] valuesToSelect)
+		public static void SetPickerWheelValues(params string[] valuesToSelect)
 		{
-			ReadOnlyCollection<IOSElement> displayedElements = FindDisplayedElements(appDriver, By.XPath(GetXPath(eGUIElementType.PickerWheel, eGUIElementFilterByAttributeType.None, string.Empty)));
-			if (displayedElements.Count != valuesToSelect.Length)
+			try
 			{
-				Console.WriteLine("ERROR: number of picker wheels displayed: " + displayedElements.Count + 
-				                  ". number of values to select: " + valuesToSelect.Length + 
-				                  ". They should match.");
-			}
-			else
-			{
-				for (int i = 0; i < displayedElements.Count; i++)
+				WaitForAttributeValue(By.XPath(GetXPath(eGUIElementType.PickerWheel)), eGUIElementAttribute.Displayed, "true", 2000);
+				ReadOnlyCollection<AppiumWebElement> pickerWheelElements = FindElements(By.XPath(GetXPath(eGUIElementType.PickerWheel)));
+				for (int i = 0; i < pickerWheelElements.Count; i++)
 				{
-					displayedElements[i].SendKeys(valuesToSelect[i]);
+					pickerWheelElements[i].SendKeys(valuesToSelect[i]);
 				}
+				if (pickerWheelElements.Count != valuesToSelect.Length)
+				{
+					Console.WriteLine("ERROR: picker wheel count and values to be selected should be equal");
+				}
+			}
+			catch (Exception e) 
+			{
+				PrintException(e);
+			}
+		}
+
+		public static void ScrollToItem(By searchItemSelector, int maxTryCount = 5) 
+		{ 
+			int elementXAxisScrollPt = 10;
+			int elementYAxisScrollPtStart = AppManager.CurrentAppDriver.Manage().Window.Size.Height - 20;
+			int elementYAxisScrollPtEnd = 60;
+			int currentTryCount = 0;
+			ScrollToTopOfList();
+			if (!(WaitForAttributeValue(searchItemSelector, eGUIElementAttribute.Displayed, "true", 2000)) &&
+			   (currentTryCount < maxTryCount))
+			{
+				AppManager.CurrentAppDriver.Swipe(elementXAxisScrollPt, elementYAxisScrollPtStart, 
+				                                  elementXAxisScrollPt, elementYAxisScrollPtEnd, 500);
+				currentTryCount++;
 			}
 		}
 
@@ -113,58 +219,19 @@ namespace appium_uicatalog
 		///     a. The element is found and the item is clicked.
 		///     b. Retry exceeds maxTryCount
 		/// </summary>
-		/// <param name="appDriver">App driver</param>
-		/// <param name="genericListItemSelector">Selector for generic list item</param>
 		/// <param name="searchItemSelector">Selector for search item</param>
 		/// <param name="maxTryCount">Max try count for scrolling between pages</param>
-		public static void ScrollAndSelectListItem(IOSDriver<IOSElement> appDriver, By genericListItemSelector, By searchItemSelector, int maxTryCount = 5)
+		public static void ScrollAndSelectListItem(By searchItemSelector, int maxTryCount = 5)
 		{
-			int firstVisibleElementYAxis = int.MaxValue;
-			int lastVisibleElementYAxis = int.MinValue;
-			int elementXAxisMidPt = -1;
-			int currentTryCount = 0;
-			ScrollToTopOfList(appDriver);
-			ReadOnlyCollection<IOSElement> displayedListItems;
-			ReadOnlyCollection<IOSElement> displayedSearchItems;
-
-			while (!IsElementDisplayed(appDriver, searchItemSelector) && (currentTryCount < maxTryCount))
-			{
-				if (IsElementDisplayed(appDriver, genericListItemSelector, out displayedListItems))
-				{
-					foreach (IOSElement element in displayedListItems)
-					{
-						int elementYLocation = element.Location.Y;
-						if (elementYLocation > lastVisibleElementYAxis)
-						{
-							lastVisibleElementYAxis = elementYLocation;
-						}
-						if (elementYLocation < firstVisibleElementYAxis)
-						{
-							firstVisibleElementYAxis = elementYLocation;
-						}
-						elementXAxisMidPt = element.Size.Width / 2;
-					}
-					currentTryCount++;
-					appDriver.Swipe(elementXAxisMidPt, lastVisibleElementYAxis - 20, elementXAxisMidPt, firstVisibleElementYAxis, 500); //Padding of 20 so Control center is not invoked.
-				}
-			}
-
-			if (!IsElementDisplayed(appDriver, searchItemSelector, out displayedSearchItems))
-			{
-				Console.WriteLine("ERROR: Element not available");
-			}
-			else
-			{
-				displayedSearchItems[0].Click();
-			}
-
+			ScrollToItem(searchItemSelector, maxTryCount);
+			Click(searchItemSelector);
 		}
 
 		/// <summary>
 		/// This method Clicks an element
 		/// </summary>
 		/// <param name="element">element to be clicked</param>
-		public static void Click(IOSElement element)
+		public static void Click(AppiumWebElement element)
 		{
 			element.Click();
 		}
@@ -174,87 +241,72 @@ namespace appium_uicatalog
 		/// </summary>
 		/// <returns>The click.</returns>
 		/// <param name="bySelector">Selector for filtering elements in app.</param>
-		public static void Click(IOSDriver<IOSElement> appDriver, By bySelector)
+		public static void Click(By bySelector)
 		{
-			ReadOnlyCollection<IOSElement> filteredElements;
-			int indexOfFirstDisplayedElement = -1;
-			if (IsElementDisplayed(appDriver, bySelector, out filteredElements))
+			try
 			{
-				//Clicking the first element with Displayed true
-				for (int i = 0; i < filteredElements.Count; i++)
-				{
-					if (filteredElements[i].Displayed)
-					{
-						indexOfFirstDisplayedElement = i;
-					}
-				}
-				filteredElements[indexOfFirstDisplayedElement].Click();
+				AppiumWebElement element = FindElement(bySelector);
+				Click(element);
 			}
-			else
+			catch (Exception e)
 			{
-				Console.WriteLine("ERROR: Element not found");
+				PrintException(e);
 			}
+		}
+
+		public static void SendKeys(AppiumWebElement element, String keysToSend)
+		{
+			element.SendKeys(keysToSend);
 		}
 
 		/// <summary>
 		/// This method sends key strokes to elements.
 		/// </summary>
-		/// <param name="appDriver">App driver.</param>
 		/// <param name="bySelector">By selector.</param>
 		/// <param name="keysToSend">Keys to send.</param>
-		public static void SendKeys(IOSDriver<IOSElement> appDriver, By bySelector, String keysToSend)
+		public static void SendKeys(By bySelector, String keysToSend)
 		{
-			ReadOnlyCollection<IOSElement> filteredDisplayedElements;
-			if (IsElementDisplayed(appDriver, bySelector, out filteredDisplayedElements))
+			try
 			{
-				filteredDisplayedElements[0].SendKeys(keysToSend);
+				AppiumWebElement element = FindElement(bySelector);
+				SendKeys(element, keysToSend);
 			}
-			else
+			catch (Exception e)
 			{
-				Console.WriteLine("ERROR: Element not found");
+				PrintException(e);
 			}
 		}
 
 		/// <summary>
 		/// This method selects Date and Time on DatePicker.
 		/// </summary>
-		/// <param name="appDriver">App driver.</param>
 		/// <param name="dateTime">Date and time.</param>
-		public static void SelectDateTimeOnDatePicker(IOSDriver<IOSElement> appDriver, DateTime dateTime)
+		public static void SelectDateTimeOnDatePicker(DateTime dateTime)
 		{
-			string monthDayXpath = "//XCUIElementTypeDatePicker//XCUIElementTypePickerWheel[1]";
-			string hoursXpath = "//XCUIElementTypeDatePicker//XCUIElementTypePickerWheel[2]";
-			string minsXpath = "//XCUIElementTypeDatePicker//XCUIElementTypePickerWheel[3]";
-			string ampmXpath = "//XCUIElementTypeDatePicker//XCUIElementTypePickerWheel[4]";
+			WaitForAttributeValue(By.XPath(GetXPath(eGUIElementType.PickerWheel)), eGUIElementAttribute.Displayed, "true", 2000);
+			ReadOnlyCollection<AppiumWebElement> pickerWheelElements = FindElements(By.XPath(GetXPath(eGUIElementType.PickerWheel)));
 
 			string monthDayStr = dateTime.ToString("MMM") + " " + dateTime.Day.ToString();
 			string hoursStr = dateTime.ToString("%h");
 			string minsStr = dateTime.ToString("mm");
 			string ampmStr = dateTime.ToString("tt");
 
-			Console.WriteLine("Send Keys : '" + monthDayStr + "' to XPath: '" + monthDayXpath + "'");
-			SendKeys(appDriver, By.XPath(monthDayXpath), monthDayStr);
-
-			Console.WriteLine("Send Keys : '" + hoursStr + "' to XPath: '" + hoursXpath + "'");
-			SendKeys(appDriver, By.XPath(hoursXpath), hoursStr);
-
-			Console.WriteLine("Send Keys : '" + minsStr + "' to XPath: '" + minsXpath + "'");
-			SendKeys(appDriver, By.XPath(minsXpath), minsStr);
-
-			Console.WriteLine("Send Keys : '" + ampmStr + "' to XPath: '" + ampmXpath + "'");
-			SendKeys(appDriver, By.XPath(ampmXpath), ampmStr);
+			SendKeys(pickerWheelElements[0], monthDayStr);
+			SendKeys(pickerWheelElements[0], hoursStr);
+			SendKeys(pickerWheelElements[0], minsStr);
+			SendKeys(pickerWheelElements[0], ampmStr);
 		}
 
 		/// <summary>
 		/// This method clicks the element until element is not available.
 		/// </summary>
 		/// <param name="bySelector">By selector.</param>
-		public static void ClickUntilElementNotAvailable(IOSDriver<IOSElement> appDriver, By bySelector)
+		public static void ClickUntilElementNotAvailable(By bySelector)
 		{
-			ReadOnlyCollection<IOSElement> filteredDisplayedElements;
-			while (IsElementDisplayed(appDriver, bySelector, out filteredDisplayedElements))
+			while (!WaitForAttributeValue(bySelector, eGUIElementAttribute.Displayed, "true", 2000))
 			{
-				Click(filteredDisplayedElements[0]);
+				AppiumWebElement element = FindElement(bySelector);
+				Click(element);
 			}
 		}
 
@@ -343,7 +395,7 @@ namespace appium_uicatalog
 			{
 				Console.WriteLine("0 elements found");
 			}
-			else
+			else 
 			{
 				if (roDisplayedElements.Count != 1)
 				{
@@ -391,11 +443,11 @@ namespace appium_uicatalog
 		/// <param name="elementType">Element type.</param>
 		/// <param name="attributeFilterType">Attribute type.</param>
 		/// <param name="attributeFilterVal">Attribute name.</param>
-		public static string GetXPath(eGUIElementType elementType, eGUIElementFilterByAttributeType attributeFilterType, string attributeFilterVal)
+		public static string GetXPath(eGUIElementType elementType, eGUIElementAttribute attributeFilterType, string attributeFilterVal)
 		{
 			string xpath = string.Empty;
 
-			xpath = GetXPathForElement(elementType) + GetXPathAttributeFilterText(attributeFilterType, attributeFilterVal);
+			xpath = GetXPath(elementType) + GetXPathAttributeFilterText(attributeFilterType, attributeFilterVal);
 			Console.WriteLine("xpath = " + xpath);
 
 			return xpath;
@@ -409,19 +461,19 @@ namespace appium_uicatalog
 		/// <returns>The XPath attribute filter text.</returns>
 		/// <param name="attributeType">Attribute type.</param>
 		/// <param name="attributeVal">Attribute value.</param>
-		private static string GetXPathAttributeFilterText(eGUIElementFilterByAttributeType attributeType, string attributeVal)
+		public static string GetXPathAttributeFilterText(eGUIElementAttribute attributeType, string attributeVal)
 		{
 			string xpathAttributeFilterText = string.Empty;
 
 			switch (attributeType)
 			{
-				case eGUIElementFilterByAttributeType.Label:
+				case eGUIElementAttribute.Label:
 					xpathAttributeFilterText = "[@label='" + attributeVal + "']";
 					break;
-				case eGUIElementFilterByAttributeType.Name:
+				case eGUIElementAttribute.Name:
 					xpathAttributeFilterText = "[@name='" + attributeVal + "']";
 					break;
-				case eGUIElementFilterByAttributeType.None:
+				case eGUIElementAttribute.None:
 					//No filter applied.
 					break;
 				default:
@@ -436,7 +488,7 @@ namespace appium_uicatalog
 		/// </summary>
 		/// <returns>The XPath for element.</returns>
 		/// <param name="elementType">Element type.</param>
-		private static string GetXPathForElement(eGUIElementType elementType)
+		public static string GetXPath(eGUIElementType elementType)
 		{
 			string xpathForElement = string.Empty;
 
@@ -456,6 +508,9 @@ namespace appium_uicatalog
 					break;
 				case eGUIElementType.AlertSecureTextField:
 					xpathForElement = "//XCUIElementTypeAlert//XCUIElementTypeSecureTextField";
+					break;
+				case eGUIElementType.AlertText:
+					xpathForElement = "//XCUIElementTypeAlert//XCUIElementTypeStaticText";
 					break;
 				case eGUIElementType.TableCell:
 					xpathForElement = "//XCUIElementTypeCell//XCUIElementTypeStaticText";
@@ -485,14 +540,30 @@ namespace appium_uicatalog
 			return xpathForElement;
 		}
 
+
+		private static AppiumWebElement GetFirstDisplayedElement(By bySelector) 
+		{
+			AppiumWebElement firstDisplayedElement = null;
+
+			ReadOnlyCollection<AppiumWebElement> elements = FindElements(bySelector);
+			foreach (AppiumWebElement element in elements) 
+			{
+				if (element.Displayed)
+				{
+					firstDisplayedElement = element;
+					break;
+				}
+			}
+			return firstDisplayedElement;
+		}
+
 		/// <summary>
 		/// This method clicks the status bar. This scrolls the list to the top.
 		/// </summary>
-		/// <param name="appDriver">App driver</param>
-		private static void ScrollToTopOfList(IOSDriver<IOSElement> appDriver)
+		private static void ScrollToTopOfList()
 		{
-			ReadOnlyCollection<IOSElement> statusBarElements = FindDisplayedElements(appDriver, By.XPath(GetXPath(eGUIElementType.StatusBarElement, eGUIElementFilterByAttributeType.None, string.Empty)));
-			Click(statusBarElements[0]);
+			AppiumWebElement firstDisplayedStatusBarElement = GetFirstDisplayedElement(By.XPath(GetXPath(eGUIElementType.StatusBarElement)));
+			Click(firstDisplayedStatusBarElement);
 		}
 
 		#endregion
