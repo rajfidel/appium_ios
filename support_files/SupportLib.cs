@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Support.UI;
 
-namespace appium_uicatalog
+namespace Fidlee.Appium
 {
 	public enum eSwitchValue
 	{

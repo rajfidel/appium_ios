@@ -6,6 +6,7 @@ using OpenQA.Selenium.Appium.iOS;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Appium;
+using Fidlee.Appium;
 
 namespace appium_uicatalog
 {

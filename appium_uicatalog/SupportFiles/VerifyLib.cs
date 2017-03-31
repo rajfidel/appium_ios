@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Appium;
 
-namespace appium_uicatalog
+namespace Fidlee.Appium
 {
 	public static class VerifyLib
 	{
